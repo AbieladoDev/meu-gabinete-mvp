@@ -1,0 +1,423 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: #ffffff;
+  --foreground: #09090b;
+  --scrollbar-thumb: #d4d4d4;
+  --scrollbar-thumb-hover: #a3a3a3;
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
+  --primary: #391BE9;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #09090b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #f4f4f5;
+  --accent-foreground: #09090b;
+  --destructive: #ef4444;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #391BE9;
+  --chart-1: #391BE9;
+  --chart-2: #5B4CF7;
+  --chart-3: #7C6FF8;
+  --chart-4: #71717a;
+  --chart-5: #09090b;
+  /* A BARRA LATERAL É SEMPRE ESCURA — o que muda entre os temas é QUANTO
+     (27/08/2026).
+
+     No tema CLARO ela é quase preta contra o conteúdo branco: é a âncora da
+     tela. `#0e0e10` e não `#000`: preto puro contra o conteúdo claro vira uma
+     serrilha dura na divisa; o fosco assenta.
+     No `.dark` ela é um cinza escuro discreto — ver o comentário lá embaixo.
+
+     Um cinza MÉDIO aqui já foi testado e descartado (27/08): contra o branco
+     do conteúdo ele não lia como cor própria, ficava com cara de branco sujo.
+
+     ⚠️ Componente dentro da barra tem que usar os tokens `--sidebar-*`. Quem
+     usar `bg-background`/`text-muted-foreground` (tokens da PÁGINA) fica com
+     a cor errada num dos dois temas. */
+  --sidebar: #0e0e10;
+  --sidebar-foreground: #fafafa;
+  /* Sobre o escuro da barra o botão é BRANCO, nos dois temas. */
+  --sidebar-primary: #fafafa;
+  --sidebar-primary-foreground: #0e0e10;
+  --sidebar-accent: #1c1c1f;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #26262a;
+  --sidebar-ring: #fafafa;
+}
+
+.dark {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --scrollbar-thumb: #3f3f46;
+  --scrollbar-thumb-hover: #52525b;
+  --card: #09090b;
+  --card-foreground: #fafafa;
+  --popover: #09090b;
+  --popover-foreground: #fafafa;
+  --primary: #6B5CF7;
+  --primary-foreground: #ffffff;
+  --secondary: #18181b;
+  --secondary-foreground: #fafafa;
+  --muted: #18181b;
+  --muted-foreground: #a1a1aa;
+  --accent: #18181b;
+  --accent-foreground: #fafafa;
+  --destructive: #ef4444;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #6B5CF7;
+  --chart-1: #6B5CF7;
+  --chart-2: #8B7FF8;
+  --chart-3: #A89FF9;
+  --chart-4: #a1a1aa;
+  --chart-5: #fafafa;
+  /* Aqui a barra é um CINZA ESCURO discreto (27/08/2026) — um degrau acima do
+     conteúdo, não uma mancha branca. A barra branca que havia antes ganhava a
+     tela inteira num tema escuro: o olho ia para a navegação, não para o
+     conteúdo.
+     O que a barra branca resolvia era a divisa sumir (problema de 21/08, com
+     barra e conteúdo no mesmo preto); aqui quem resolve isso é a
+     `--sidebar-border` clara, não o contraste do fundo.
+     ⚠️ Os dois temas NÃO são espelhos: no claro a barra é quase preta, aqui é
+     cinza escuro. Mudar um não implica mudar o outro. O que continua valendo
+     em ambos: fundo e `foreground` andam em par. */
+  --sidebar: #1c1c1f;
+  --sidebar-foreground: #fafafa;
+  /* Sobre o cinza escuro da barra o botão continua BRANCO, como no tema claro
+     — a barra é escura nos dois, só muda o quanto. */
+  --sidebar-primary: #fafafa;
+  --sidebar-primary-foreground: #0e0e10;
+  /* Item ativo/hover: um degrau MAIS CLARO, porque aqui a barra já é escura.
+     No tema claro é o contrário (a barra é quase preta e o accent, mais claro
+     ainda que ela, encostaria no conteúdo) — por isso os dois não são
+     espelhos um do outro. */
+  --sidebar-accent: #2a2a2e;
+  --sidebar-accent-foreground: #fafafa;
+  /* A borda é o que segura a divisa. Com a barra em `#1c1c1f` e o conteúdo em
+     `#09090b`, os dois escuros ficam perto demais: sem uma borda mais clara
+     que ambos, a separação some — que foi o problema de 21/08, quando a barra
+     era escura e não havia nada marcando o limite. */
+  --sidebar-border: #3f3f46;
+  --sidebar-ring: #fafafa;
+}
+
+/* ------------------------------------------------------------ BARRA UNIFORME
+
+   O modo em que a barra lateral e o cabeçalho ACOMPANHAM o conteúdo, em vez
+   de serem o contrário dele (30/08/2026, pedido do Arthur). Com o tema, dá as
+   quatro combinações que o painel oferece:
+
+   | Tema  | Navegação  | Como fica                                   |
+   |-------|------------|---------------------------------------------|
+   | Claro | contraste  | barra quase preta, conteúdo branco (padrão) |
+   | Claro | uniforme   | **tudo branco**                             |
+   | Escuro| contraste  | barra cinza um degrau acima do conteúdo     |
+   | Escuro| uniforme   | **tudo escuro**, no mesmo preto da página   |
+
+   ⚠️ Nenhum componente precisa mudar: eles já usam `--sidebar-*`, e é só o
+   valor desses tokens que troca aqui. Componente que tenha usado token da
+   PÁGINA ou cor fixa é justamente o que vai aparecer errado nestes modos — o
+   sintoma é útil, não conserte com exceção local (armadilha -1).
+
+   ⚠️ A BORDA é o que segura a divisa nos DOIS: com barra e conteúdo na mesma
+   cor, sem ela a navegação e a página viram uma superfície só. Foi exatamente
+   o problema de 21/08/2026, quando as duas eram o mesmo preto e nada marcava
+   o limite. Por isso `--sidebar-border` contrasta com o fundo nos dois blocos,
+   e no claro a barra ainda fica um fio abaixo do branco puro da página. */
+html:not(.dark)[data-barra="uniforme"] {
+  --sidebar: #fafafa;
+  --sidebar-foreground: #09090b;
+  /* Sobre a barra clara o botão volta a ser quase-preto, como na página. */
+  --sidebar-primary: #09090b;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #ececee;
+  --sidebar-accent-foreground: #09090b;
+  --sidebar-border: #d9d9de;
+  --sidebar-ring: #09090b;
+}
+
+/* ⚠️ `.dark` na frente porque este bloco vem DEPOIS do `.dark` no arquivo e
+   precisa vencê-lo — dois seletores de classe contra um. Aqui a barra desce
+   ao preto da PÁGINA (`#09090b`), não ao cinza `#1c1c1f` do modo contraste. */
+html.dark[data-barra="uniforme"] {
+  --sidebar: #09090b;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #fafafa;
+  --sidebar-primary-foreground: #09090b;
+  /* Item ativo/hover um degrau ACIMA do fundo — é o único relevo que sobra
+     quando barra e conteúdo têm a mesma cor. */
+  --sidebar-accent: #1c1c1f;
+  --sidebar-accent-foreground: #fafafa;
+  /* Mais clara que os dois lados: é ela, sozinha, que desenha a divisa. */
+  --sidebar-border: #3f3f46;
+  --sidebar-ring: #fafafa;
+}
+
+/* O CABEÇALHO NO CELULAR é CLARO (22/10/2026, cópia do todosDan-client):
+   abaixo de 768px os tokens `--sidebar-*` do cabeçalho viram os da PÁGINA.
+   Os painéis que abrem vão para um portal no `body` e continuam na cor da
+   barra. */
+/* O CABEÇALHO DO MÓDULO (30/10/2026, cópia do client): o fundo é o da JANELA,
+   e os `--sidebar-*` daqui passam a ser os da página. */
+.cabecalho-modulo {
+  --sidebar: var(--background);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-accent: var(--muted);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+}
+
+@media (max-width: 767px) {
+  .cabecalho-celular {
+    --sidebar: var(--background);
+    --sidebar-foreground: var(--foreground);
+    /* O + do celular é SÓ ÍCONE — sem o círculo de fundo. */
+    --sidebar-accent: transparent;
+    --sidebar-accent-foreground: var(--foreground);
+    --sidebar-border: var(--border);
+  }
+}
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  /* ESCALA DA CASA (15/10/2026): o painel como no zoom de 80% do Chrome, a partir de
+     768px — sobra espaço para tudo, sobretudo com muitos módulos. Tudo em rem encolhe
+     junto; px fixo (text-[11px]) não. Celular fica como está. Voltar = --escala: 1. */
+  html {
+    --escala: 0.8;
+    font-size: 14px;
+  }
+  @media (min-width: 640px) {
+    html {
+      font-size: 15px;
+    }
+  }
+  @media (min-width: 768px) {
+    html {
+      font-size: calc(16px * var(--escala));
+    }
+  }
+  @media (min-width: 1024px) {
+    html {
+      font-size: calc(17.4px * var(--escala));
+    }
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Custom scrollbar - Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  .maplibregl-popup-content {
+    @apply bg-transparent! shadow-none! p-0! rounded-none!;
+  }
+  .maplibregl-popup-tip {
+    @apply hidden!;
+  }
+}
+
+/* O item ativo NÃO tem marca própria (casca do todosDan, 31/10/2026).
+   Ele se distingue pelo mesmo realce do hover — `data-[active=true]:bg-sidebar-accent`,
+   que vem do `ui/sidebar.tsx` — mais o peso da fonte. A barra roxa com brilho
+   que havia aqui era um segundo sinal disputando com esse realce. */
+
+/* Leaflet Map Custom Styles */
+.leaflet-container {
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Remove default Leaflet marker styles */
+.custom-marker-container {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Property marker hover effect */
+.property-marker:hover > div:first-child {
+  transform: scale(1.08) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Leaflet Popup Styles */
+.leaflet-popup-content-wrapper {
+  background: var(--background) !important;
+  color: var(--foreground) !important;
+  border-radius: 12px !important;
+  padding: 0 !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid var(--border) !important;
+  overflow: hidden !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+.leaflet-popup-tip-container {
+  display: none !important;
+}
+
+.leaflet-popup-close-button {
+  color: var(--muted-foreground) !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
+  padding: 4px 8px !important;
+  width: auto !important;
+  height: auto !important;
+  top: 6px !important;
+  right: 6px !important;
+  transition: color 0.15s ease !important;
+  z-index: 10 !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: var(--foreground) !important;
+  background: var(--muted) !important;
+  border-radius: 4px !important;
+}
+
+/* Dark mode adjustments */
+.dark .leaflet-popup-content-wrapper {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .property-marker:hover > div:first-child {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Safe Area for iOS devices (iPhone X and later) */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* Bottom Navigation Styles */
+.bottom-nav-blur {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+/**
+ * BARRA DE ROLAGEM FANTASMA — 3px, e só aparece quando o ponteiro está sobre o
+ * bloco que rola (28/08/2026, pedido do Arthur).
+ *
+ * A barra global já é fina (4px, 35% de opacidade), mas na ficha do aluno ela
+ * aparece em TRÊS lugares ao mesmo tempo — a coluna de identidade, a fila de
+ * abas e o conteúdo da aba —, e três traços cinzas em volta do conteúdo pesam
+ * mais do que a soma deles.
+ *
+ * ⚠️ Ela continua OCUPANDO os 3px: não ocupar exigiria overlay scrollbar, que
+ * os navegadores não expõem mais. O que muda é o peso visual, não o espaço.
+ *
+ * ⚠️ `transparent` no repouso, e não `display: none`: some com a barra sem
+ * tirar a rolagem por roda ou toque, e sem mudar a largura no hover — com
+ * `none` o conteúdo pularia 3px toda vez que o mouse entrasse.
+ */
+.barra-fantasma {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.barra-fantasma:hover {
+  scrollbar-color: color-mix(in srgb, var(--scrollbar-thumb) 45%, transparent)
+    transparent;
+}
+
+.barra-fantasma::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+.barra-fantasma::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.barra-fantasma::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 2px;
+}
+
+.barra-fantasma:hover::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--scrollbar-thumb) 45%, transparent);
+}
