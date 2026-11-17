@@ -18,12 +18,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Meu Gabinete",
-  description: "Pesquisas e mapa do gabinete",
+  description: "Gestão do seu gabinete",
   // Prévia do link no WhatsApp/Instagram: a imagem é `opengraph-image.png` (logo da db).
   // Na Vercel o Next completa a URL absoluta sozinho (VERCEL_PROJECT_PRODUCTION_URL).
   openGraph: {
     title: "Meu Gabinete",
-    description: "Responda a pesquisa do seu bairro — desenvolvido por db.app",
+    description: "Gestão do seu gabinete — desenvolvido por db.app",
     siteName: "Meu Gabinete",
     locale: "pt_BR",
     type: "website",

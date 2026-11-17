@@ -159,7 +159,7 @@ export default function LoginPage() {
                   </span>&rdquo;
                 </p>
                 <p className="text-base text-zinc-500 dark:text-zinc-400">
-                  Pesquisas para a população responder pelo celular, com cada resposta no mapa da cidade.
+                  A gestão do seu gabinete em um só lugar: pessoas, atuações e o mapa da cidade.
                 </p>
               </blockquote>
 
