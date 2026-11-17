@@ -62,6 +62,33 @@ export function porBairro(respostas: Pick<Resposta, "bairro">[]): Contagem[] {
   return contar(respostas.map((r) => r.bairro.trim() || "Sem bairro"))
 }
 
+/** Quantas pessoas por rua (com o bairro, porque nome de rua se repete). Quem não tem rua fica fora. */
+export function porRua(respostas: Pick<Resposta, "rua" | "bairro">[]): Contagem[] {
+  return contar(
+    respostas
+      .filter((r) => r.rua.trim())
+      .map((r) => (r.bairro.trim() ? `${r.rua.trim()} · ${r.bairro.trim()}` : r.rua.trim()))
+  )
+}
+
+/** De onde veio cada pessoa: a pesquisa que respondeu, ou "Cadastro direto" (feito no painel). */
+export const CADASTRO_DIRETO = "Cadastro direto"
+export function porPesquisa(respostas: Pick<Resposta, "pesquisaId">[], titulos: Record<string, string>): Contagem[] {
+  return contar(respostas.map((r) => titulos[r.pesquisaId] ?? CADASTRO_DIRETO))
+}
+
+/** Distância em linha reta (haversine), em km. */
+export function distanciaKm(
+  a: { latitude: number; longitude: number },
+  b: { latitude: number; longitude: number }
+): number {
+  const rad = (g: number) => (g * Math.PI) / 180
+  const dLat = rad(b.latitude - a.latitude)
+  const dLng = rad(b.longitude - a.longitude)
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.latitude)) * Math.cos(rad(b.latitude)) * Math.sin(dLng / 2) ** 2
+  return 6371 * 2 * Math.asin(Math.sqrt(h))
+}
+
 /**
  * Resultado de uma pergunta de escolha: TODAS as opções aparecem (inclusive
  * com zero), na ordem em que foram cadastradas. Resposta com opção que não

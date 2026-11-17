@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { HandHelping, MessageCircle, Plus, Trash2 } from "lucide-react"
+import { HandHelping, MessageCircle, Plus, Trash2, UserPlus } from "lucide-react"
 import { toast } from "sonner"
 
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
@@ -17,9 +17,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Pessoinha, tempoRelativo } from "@/components/gabinete/pecas"
 import { MapaDeRespostas } from "@/components/gabinete/mapa-de-respostas"
 import { AtuacaoFormModal, LinhaAtuacao } from "@/components/gabinete/atuacoes"
+import { PessoaFormModal } from "@/components/gabinete/pessoa-form-modal"
 import type { Atuacao, Resposta } from "@/data/tipos"
 import { formatDateTime } from "@/lib/format"
-import { normalizar } from "@/lib/geo"
+import { CADASTRO_DIRETO, normalizar } from "@/lib/geo"
 import { useGabineteStore } from "@/store/gabinete-store"
 
 const POR_PAGINA = 50
@@ -41,12 +42,14 @@ export default function PessoasPage() {
   const [abertaId, setAbertaId] = React.useState<string | null>(null)
   const [excluindo, setExcluindo] = React.useState<Resposta | null>(null)
   const [limite, setLimite] = React.useState(POR_PAGINA)
+  const [cadastrando, setCadastrando] = React.useState(false)
 
   // ?pesquisa=<id> (vem da ficha da pesquisa) e ?id=<resposta> (vem da busca)
   React.useEffect(() => {
     const q = new URLSearchParams(window.location.search)
     if (q.get("pesquisa")) setFiltro(q.get("pesquisa")!)
     if (q.get("id")) setAbertaId(q.get("id"))
+    if (q.get("nova")) setCadastrando(true)
   }, [])
 
   const titulo = React.useMemo(() => Object.fromEntries(pesquisas.map((p) => [p.id, p.titulo])), [pesquisas])
@@ -54,7 +57,7 @@ export default function PessoasPage() {
     const q = normalizar(busca)
     return todas.filter(
       (r) =>
-        (filtro === "todas" || r.pesquisaId === filtro) &&
+        (filtro === "todas" || (filtro === "direto" ? !r.pesquisaId : r.pesquisaId === filtro)) &&
         (!q || normalizar(`${r.nome} ${r.bairro} ${r.rua} ${r.telefone}`).includes(q))
     )
   }, [todas, filtro, busca])
@@ -64,15 +67,25 @@ export default function PessoasPage() {
   return (
     <DashboardLayout
       title="Pessoas"
-      description="Quem respondeu às pesquisas. Clique numa linha para ver as respostas e o endereço."
+      description="Quem respondeu às pesquisas ou foi cadastrado pelo gabinete. Clique numa linha para ver os dados e o endereço."
       contagem={lista.length}
+      actions={
+        <Button onClick={() => setCadastrando(true)}>
+          <UserPlus className="h-4 w-4" />
+          Cadastrar pessoa
+        </Button>
+      }
       toolbar={
         <div className="flex w-full flex-wrap items-center gap-2">
           <TagPicker
-            label="Pesquisa"
+            label="Origem"
             value={filtro}
             onChange={setFiltro}
-            options={[{ value: "todas", label: "Todas" }, ...pesquisas.map((p) => ({ value: p.id, label: p.titulo }))]}
+            options={[
+              { value: "todas", label: "Todas" },
+              ...pesquisas.map((p) => ({ value: p.id, label: p.titulo })),
+              { value: "direto", label: CADASTRO_DIRETO },
+            ]}
           />
           <SearchInput value={busca} onChange={setBusca} placeholder="Nome, bairro, rua ou telefone" className="ml-auto" />
         </div>
@@ -84,7 +97,7 @@ export default function PessoasPage() {
             <TableRow>
               <TableHead>Pessoa</TableHead>
               <TableHead>Bairro</TableHead>
-              <TableHead className="hidden md:table-cell">Pesquisa</TableHead>
+              <TableHead className="hidden md:table-cell">Origem</TableHead>
               <TableHead className="hidden text-right lg:table-cell">Quando</TableHead>
             </TableRow>
           </TableHeader>
@@ -120,7 +133,7 @@ export default function PessoasPage() {
                   <p>{r.bairro || "—"}</p>
                   <p className="text-xs text-muted-foreground">{r.rua}</p>
                 </TableCell>
-                <TableCell className="hidden text-sm md:table-cell">{titulo[r.pesquisaId]}</TableCell>
+                <TableCell className="hidden text-sm md:table-cell">{titulo[r.pesquisaId] ?? CADASTRO_DIRETO}</TableCell>
                 <TableCell className="hidden text-right text-sm text-muted-foreground lg:table-cell">
                   {tempoRelativo(r.criadaEm)}
                 </TableCell>
@@ -149,7 +162,7 @@ export default function PessoasPage() {
           <SidePanel
             media={<Pessoinha nome={aberta.nome} />}
             title={aberta.nome}
-            subtitle={titulo[aberta.pesquisaId]}
+            subtitle={titulo[aberta.pesquisaId] ?? CADASTRO_DIRETO}
             onClose={() => setAbertaId(null)}
             footer={
               <>
@@ -168,7 +181,7 @@ export default function PessoasPage() {
           >
             <PanelFacts>
               <PanelFact label="Telefone" value={aberta.telefone || "—"} />
-              <PanelFact label="Respondeu em" value={formatDateTime(aberta.criadaEm)} />
+              <PanelFact label={aberta.pesquisaId ? "Respondeu em" : "Cadastrada em"} value={formatDateTime(aberta.criadaEm)} />
               <PanelFact label="Endereço" value={`${aberta.rua}${aberta.numero ? `, ${aberta.numero}` : ""}`} hint={aberta.cep} />
               <PanelFact label="Bairro" value={aberta.bairro || "—"} hint={`${aberta.cidade}/${aberta.uf}`} />
             </PanelFacts>
@@ -200,15 +213,17 @@ export default function PessoasPage() {
               )}
             </section>
 
-            <div className="space-y-3">
-              <p className="text-sm font-semibold">Respostas da pesquisa</p>
-              {(pesquisas.find((p) => p.id === aberta.pesquisaId)?.perguntas ?? []).map((q) => (
-                <div key={q.id}>
-                  <p className="text-xs text-muted-foreground">{q.texto}</p>
-                  <p className="text-sm font-medium">{aberta.respostas[q.id] || "—"}</p>
-                </div>
-              ))}
-            </div>
+            {aberta.pesquisaId && (
+              <div className="space-y-3">
+                <p className="text-sm font-semibold">Respostas da pesquisa</p>
+                {(pesquisas.find((p) => p.id === aberta.pesquisaId)?.perguntas ?? []).map((q) => (
+                  <div key={q.id}>
+                    <p className="text-xs text-muted-foreground">{q.texto}</p>
+                    <p className="text-sm font-medium">{aberta.respostas[q.id] || "—"}</p>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div className="space-y-1.5">
               <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -229,15 +244,16 @@ export default function PessoasPage() {
         pessoaId={aberta?.id ?? null}
         onOpenChange={(aberto) => setFormAtuacao((f) => ({ ...f, aberto }))}
       />
+      <PessoaFormModal open={cadastrando} onOpenChange={setCadastrando} onCadastrada={(p) => setAbertaId(p.id)} />
       <ConfirmDeleteDialog
         open={!!excluindo}
         onOpenChange={(o) => !o && setExcluindo(null)}
-        title="Excluir resposta"
-        subject="a resposta de"
+        title="Excluir pessoa"
+        subject="o cadastro de"
         itemName={excluindo?.nome ?? ""}
         onConfirm={() => {
           if (excluindo) excluirResposta(excluindo.id)
-          toast.success("Resposta excluída")
+          toast.success("Pessoa excluída")
           setExcluindo(null)
           setAbertaId(null)
         }}

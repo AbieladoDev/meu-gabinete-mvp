@@ -1,6 +1,6 @@
 "use client"
 
-import { ClipboardPlus, HandHelping } from "lucide-react"
+import { ClipboardPlus, HandHelping, UserPlus } from "lucide-react"
 
 import { useAuthStore } from "@/store/auth-store"
 import { can } from "@/lib/permissions"
@@ -32,6 +32,13 @@ export const QUICK_CREATE: QuickCreateAction[] = [
     icon: ClipboardPlus,
     href: "/pesquisas?nova=1",
     color: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+  },
+  {
+    label: "Cadastrar pessoa",
+    description: "Entra na lista e no mapa",
+    icon: UserPlus,
+    href: "/pessoas?nova=1",
+    color: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
   },
   {
     label: "Registrar atuação",

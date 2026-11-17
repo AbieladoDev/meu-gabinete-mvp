@@ -25,6 +25,13 @@ typecheck: `pnpm typecheck` · migration: não se aplica
   pessoa); no `SidePanel` de `/pessoas` entra só o resumo (5 + "ver todas") e o "Registrar".
   Categorias em `CATEGORIAS_ATUACAO` (`data/seed.ts`), ícone/cor em `components/gabinete/atuacoes.tsx`.
   "Pessoa" no MVP = uma `Resposta`; quem responde duas pesquisas vira duas pessoas.
+- **Cadastro direto de pessoa** (16/11/2026): botão em `/pessoas` (`?nova=1`) abre
+  `components/gabinete/pessoa-form-modal.tsx`; grava `Resposta` com `pesquisaId: ""`. Onde aparece o
+  título da pesquisa, o vazio vira `CADASTRO_DIRETO` (`lib/geo.ts`); filtro "Origem" tem a opção `direto`.
+- **Início**: sem botão de criar pesquisa (pedido do Arthur). Gráfico principal = mapa + bairros;
+  abaixo, ruas (`porRua`) e pessoas por pesquisa (`porPesquisa`).
+- **"Você" no mapa**: `hooks/use-minha-localizacao.ts` pede a geolocalização do navegador uma vez e
+  o `MapaDeRespostas` (só com `controles`) põe o ponto laranja. `/mapa` mostra "Perto de você".
 - `src/app/f/[id]` — **público**, o formulário que vai no link. Fora da casca, sem login.
 - `src/app/login` — conta fixa `CONTA_DEMO` (`data/seed.ts`), já preenchida. Não é segurança.
 - `src/data/tipos.ts` — Pesquisa, Pergunta, Resposta, Gabinete (nomes pensados para virar models).
@@ -61,5 +68,8 @@ Base = `default-admin` de 05/11/2026 (casca padrão do todosDan-client, escala 8
    com sharp a partir de `meugabinete-admin/public/Logo-DB/Logotipo - DB APP Developer FUNDO AZUL.png`.
    Na Vercel o Next completa a URL sozinho; fora dela, setar `metadataBase` no `layout.tsx` (o build
    local avisa "using http://localhost:3000" — normal). Formulário público assina "desenvolvido por db.app".
+8. Geolocalização só funciona em HTTPS (Vercel) ou `localhost`; o navegador pergunta ao abrir o
+   Início/Mapa. Negou → sem ponto "Você" e sem "Perto de você", sem erro na tela. Em computador sem
+   GPS a posição vem do Wi-Fi/IP e pode errar por quilômetros.
 7. Atalhos `?nova=1`, `?pesquisa=`, `?id=` são lidos com `window.location.search` num efeito
    (`useSearchParams` exigiria Suspense no build).

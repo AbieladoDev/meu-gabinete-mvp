@@ -26,6 +26,7 @@ export interface Pesquisa {
 
 export interface Resposta {
   id: string
+  /** "" = pessoa cadastrada direto no painel (`PessoaFormModal`), sem pesquisa. */
   pesquisaId: string
   nome: string
   telefone: string

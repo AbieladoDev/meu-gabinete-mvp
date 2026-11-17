@@ -2,6 +2,14 @@
 
 Mais recente no topo. As decisões do `default-admin` (base deste projeto) estão no DECISIONS.md de lá.
 
+## 2026-11-16 — Pessoa cadastrada no painel é uma `Resposta` sem pesquisa
+**Decidido:** o cadastro direto de `/pessoas` grava `Resposta` com `pesquisaId: ""` e `respostas: {}`.
+**Por quê:** mapa, atuações, busca e gráficos já leem `respostas`; a pessoa nova entra em tudo sem
+mexer em nenhum deles nem migrar o `localStorage` de quem já abriu a demo.
+**Rejeitado:** criar a entidade `Pessoa` separada de `Resposta` — é o certo para o sistema real
+(resolve também "respondeu duas pesquisas = duas pessoas"), mas no MVP exigiria reescrever o seed e
+todas as telas. Fazer isso ao levar para o `meugabinete-api`.
+
 ## 2026-11-05 — MVP só front, base no default-admin, já logado
 **Decidido:** front-only como `apae-mvp`/`dr-financeiro-mvp` (zustand + `localStorage`), copiado do
 `default-admin` atual (casca padrão desde 31/10/2026) sem a camada de API, abrindo já logado numa

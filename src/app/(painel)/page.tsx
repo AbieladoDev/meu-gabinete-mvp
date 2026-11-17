@@ -2,13 +2,12 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { ArrowRight, CalendarDays, ClipboardList, MapPinned, Plus, Users } from "lucide-react"
+import { ArrowRight, CalendarDays, ClipboardList, MapPinned, Users } from "lucide-react"
 
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
-import { Button } from "@/components/ui/button"
 import { Indicador, LinhasDeComposicao, Pessoinha, tempoRelativo } from "@/components/gabinete/pecas"
 import { MapaDeRespostas } from "@/components/gabinete/mapa-de-respostas"
-import { porBairro, recentes } from "@/lib/geo"
+import { CADASTRO_DIRETO, porBairro, porPesquisa, porRua, recentes } from "@/lib/geo"
 import { useGabineteStore, useHidratado } from "@/store/gabinete-store"
 
 export default function Inicio() {
@@ -21,29 +20,23 @@ export default function Inicio() {
   const semanaAnterior = recentes(respostas, 14).length - semana
   const variacao = semana - semanaAnterior
   const bairros = porBairro(respostas)
+  const ruas = porRua(respostas)
   const ativas = pesquisas.filter((p) => p.ativa).length
   const titulo = Object.fromEntries(pesquisas.map((p) => [p.id, p.titulo]))
+  const origens = porPesquisa(respostas, titulo)
   const primeiroNome = gabinete.vereador.split(" ")[0]
 
   return (
     <DashboardLayout
       title={`Olá, ${primeiroNome}`}
       description={`${gabinete.cargo} · ${gabinete.cidade}/${gabinete.uf}`}
-      actions={
-        <Button asChild>
-          <Link href="/pesquisas?nova=1">
-            <Plus className="h-4 w-4" />
-            Nova pesquisa
-          </Link>
-        </Button>
-      }
     >
       <div className="space-y-6">
         <div className="grid grid-cols-2 gap-x-6 gap-y-4 border-b pb-5 lg:grid-cols-4">
           <Indicador
             icone={Users}
             cor="bg-blue-500/10 text-blue-600 dark:text-blue-400"
-            rotulo="Pessoas ouvidas"
+            rotulo="Pessoas cadastradas"
             valor={respostas.length}
           />
           <Indicador
@@ -76,7 +69,7 @@ export default function Inicio() {
         <div className="grid gap-6 lg:grid-cols-[3fr_2fr]">
           <section className="space-y-2">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold">Onde estão as respostas</h3>
+              <h3 className="text-sm font-semibold">Onde estão as pessoas</h3>
               <Link href="/mapa" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
                 Abrir mapa <ArrowRight className="h-3 w-3" />
               </Link>
@@ -85,8 +78,24 @@ export default function Inicio() {
           </section>
 
           <section className="space-y-3">
-            <h3 className="text-sm font-semibold">Bairros com mais respostas</h3>
+            <h3 className="text-sm font-semibold">Bairros com mais pessoas</h3>
             <LinhasDeComposicao itens={bairros} limite={7} destaque="bg-violet-500" />
+          </section>
+        </div>
+
+        <div className="grid gap-6 border-t pt-5 lg:grid-cols-2">
+          <section className="space-y-3">
+            <h3 className="text-sm font-semibold">Ruas com mais pessoas</h3>
+            <LinhasDeComposicao itens={ruas} limite={6} destaque="bg-violet-500" />
+          </section>
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold">Pessoas por pesquisa</h3>
+              <Link href="/pesquisas" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
+                Ver pesquisas <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+            <LinhasDeComposicao itens={origens} limite={6} destaque="bg-amber-500" />
           </section>
         </div>
 
@@ -105,7 +114,7 @@ export default function Inicio() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{r.nome}</p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {r.bairro} · {titulo[r.pesquisaId]}
+                      {r.bairro} · {titulo[r.pesquisaId] ?? CADASTRO_DIRETO}
                     </p>
                   </div>
                   <span className="shrink-0 text-xs text-muted-foreground">{tempoRelativo(r.criadaEm)}</span>

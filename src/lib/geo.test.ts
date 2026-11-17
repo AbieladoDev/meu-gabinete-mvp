@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import type { Pergunta } from "@/data/tipos"
-import { centerOf, formatPhone, formatZipCode, normalizar, porBairro, recentes, resultadoDaPergunta, toPointCollection } from "./geo"
+import { centerOf, distanciaKm, formatPhone, formatZipCode, normalizar, porBairro, porPesquisa, porRua, recentes, resultadoDaPergunta, toPointCollection } from "./geo"
 
 describe("toPointCollection", () => {
   it("inverte para [lng, lat], que é a ordem do GeoJSON", () => {
@@ -38,6 +38,36 @@ describe("porBairro", () => {
     const r = porBairro([{ bairro: "Centro" }, { bairro: "Vargas" }, { bairro: "Centro" }, { bairro: " " }])
     expect(r[0]).toEqual({ rotulo: "Centro", total: 2, percentual: 50 })
     expect(r.map((x) => x.rotulo)).toContain("Sem bairro")
+  })
+})
+
+describe("porRua", () => {
+  it("conta por rua + bairro e ignora quem não tem rua", () => {
+    const r = porRua([
+      { rua: "Rua A", bairro: "Centro" },
+      { rua: "Rua A", bairro: "Centro" },
+      { rua: "Rua A", bairro: "Vargas" },
+      { rua: " ", bairro: "Centro" },
+    ])
+    expect(r[0]).toEqual({ rotulo: "Rua A · Centro", total: 2, percentual: 67 })
+    expect(r).toHaveLength(2)
+  })
+})
+
+describe("porPesquisa", () => {
+  it("usa o título da pesquisa e junta cadastro feito no painel em 'Cadastro direto'", () => {
+    const r = porPesquisa([{ pesquisaId: "p1" }, { pesquisaId: "p1" }, { pesquisaId: "" }], { p1: "Prioridades" })
+    expect(r).toEqual([
+      { rotulo: "Prioridades", total: 2, percentual: 67 },
+      { rotulo: "Cadastro direto", total: 1, percentual: 33 },
+    ])
+  })
+})
+
+describe("distanciaKm", () => {
+  it("é zero no mesmo ponto e ~111 km por grau de latitude", () => {
+    expect(distanciaKm({ latitude: -29.8, longitude: -51.1 }, { latitude: -29.8, longitude: -51.1 })).toBe(0)
+    expect(distanciaKm({ latitude: -29, longitude: -51 }, { latitude: -30, longitude: -51 })).toBeCloseTo(111.2, 0)
   })
 })
 

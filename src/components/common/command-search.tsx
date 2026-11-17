@@ -74,6 +74,7 @@ const searchData: SearchCategory[] = [
     title: "Ações rápidas",
     links: [
       { title: "Nova pesquisa", url: "/pesquisas?nova=1", icon: Plus, keywords: ["criar pesquisa", "novo formulario"] },
+      { title: "Cadastrar pessoa", url: "/pessoas?nova=1", icon: Plus, keywords: ["nova pessoa", "novo cadastro", "morador"] },
       { title: "Registrar atuação", url: "/atuacoes?nova=1", icon: Plus, keywords: ["nova atuacao", "atendimento", "historico"] },
     ],
   },
